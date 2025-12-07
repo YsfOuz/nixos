@@ -1,0 +1,34 @@
+# ==============================================================================
+# VERDIGRIS - Base16 Color Scheme
+# ==============================================================================
+# Author: YsfOuz
+# Optimized for: Versatile use - Good at any opacity (25%-100%)
+# ==============================================================================
+
+scheme: "Verdigris"
+author: "YsfOuz"
+
+# BACKGROUNDS (Balanced dark - works everywhere)
+base00: "0a1a1b"  # Deep Patina
+base01: "0f2d2e"  # Aged Copper
+base02: "1a4041"  # Oxidized Surface
+base03: "4a7a7d"  # Weathered Bronze (brightened 2x for transparency)
+
+# FOREGROUNDS (High contrast but not extreme)
+base04: "8ab5b8"  # Tarnished Metal
+base05: "c8e0e2"  # Moonlit Verdigris
+base06: "d8e8ea"  # Polished Surface
+base07: "e8f4f5"  # Bright Oxide
+
+# ACCENTS (Saturated but maintaining Verdigris identity)
+base08: "d63946"  # Rust Red (vibrant rust)
+base09: "e8763a"  # Warm Corrosion (warm copper)
+base0A: "e5b865"  # Golden Patina (aged gold)
+base0B: "52a888"  # Forest Oxide (oxidized green)
+base0C: "2db9ba"  # Pure Verdigris (true verdigris)
+base0D: "4fc3c4"  # Aqua Patina (aqua copper)
+base0E: "b87dae"  # Mystic Tarnish (mystic purple)
+base0F: "a8765d"  # Ancient Wood (weathered wood)
+
+# Works at 100% (normal), 50-80% (transparent), 25-40% (extreme)
+# Maintains Verdigris identity at all opacity levels
