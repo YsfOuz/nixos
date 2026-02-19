@@ -8,6 +8,7 @@
 *Themed around [Verdigris](verdigris.yaml) — a custom base16 colorscheme.*
 
 ![Verdigris](verdigris.png)
+![Preview](preview.mp4)
 
 </div>
 
