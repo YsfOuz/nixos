@@ -15,6 +15,7 @@
     efi.canTouchEfiVariables = true;
   };
 
+  boot.initrd.kernelModules = [ "xe" ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [
     "i915.force_probe=!7d55"
@@ -47,6 +48,7 @@
       vpl-gpu-rt
       intel-compute-runtime
       level-zero
+      intel-npu-driver
     ];
   };
 
