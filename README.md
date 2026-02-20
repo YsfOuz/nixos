@@ -1,6 +1,6 @@
 <div align="center">
 
-# nixos
+# NixOS
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?lines=NixOS+%2B+Hyprland;Flake-based+%26+Reproducible;Themed+with+Verdigris&center=true&width=450&height=50&color=43B3AE&vCenter=true&size=18)](https://git.io/typing-svg)
 
