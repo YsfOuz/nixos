@@ -3,7 +3,7 @@
 ![Verdigris](verdigris.png)
 https://github.com/user-attachments/assets/455ce3d4-a937-497a-8c73-cb349be3b06f
 
-# ❧ verdigris
+# verdigris
 
 *A NixOS flake for the Lenovo ThinkPad E16 Gen 2*
 
