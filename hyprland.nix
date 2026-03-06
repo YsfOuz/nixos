@@ -17,6 +17,7 @@
     tumbler
     rofi-power-menu
     brightnessctl
+    libnotify
   ];
 
   # ==========================================================================
@@ -27,7 +28,7 @@
   programs.rofi = {
     enable = true;
     extraConfig.show-icons = true;
-    location = "left";
+    location = "right";
     theme =
       let
         inherit (config.lib.formats.rasi) mkLiteral;
@@ -213,31 +214,13 @@
         margin-left = 8;
         margin-right = 8;
 
-        modules-left = [ "cava#left" ];
-        modules-center = [ "mpris" ];
-        modules-right = [ "cava#right" ];
+        modules-left = [ "mpris" ];
+        modules-center = [ "cava" ];
+        modules-right = [ ];
 
-        "cava#left" = {
+        "cava" = {
+          bars = 64;
           bar_delimiter = 0;
-          stereo = false;
-          bars = 24;
-          format-icons = [
-            "▁"
-            "▂"
-            "▃"
-            "▄"
-            "▅"
-            "▆"
-            "▇"
-            "█"
-          ];
-        };
-
-        "cava#right" = {
-          bar_delimiter = 0;
-          stereo = false;
-          reverse = true;
-          bars = 24;
           format-icons = [
             "▁"
             "▂"
@@ -279,12 +262,13 @@
   # SERVICES
   # ==========================================================================
 
-  services.swayosd.enable = true;
-  services.cliphist.enable = true;
-  services.cliphist.extraOptions = [
-    "-max-items"
-    "50"
-  ];
+  services.cliphist = {
+    enable = true;
+    extraOptions = [
+      "-max-items"
+      "50"
+    ];
+  };
 
   services.mako = {
     enable = true;
@@ -301,7 +285,6 @@
   services.network-manager-applet.enable = true;
   services.blueman-applet.enable = true;
   services.playerctld.enable = true;
-  services.hyprpaper.enable = true;
 
   # ==========================================================================
   # IDLE & LOCK
@@ -416,6 +399,8 @@
           size = 4;
           passes = 4;
           noise = 0.1;
+          special = true;
+          popups = true;
         };
       };
 
@@ -433,10 +418,8 @@
       input = {
         kb_layout = "tr";
         accel_profile = "flat";
-        force_no_accel = true;
         touchpad = {
           natural_scroll = true;
-          disable_while_typing = true;
         };
       };
 
@@ -446,23 +429,25 @@
         vfr = true;
       };
 
+      ecosystem = {
+        no_update_news = true;
+        no_donation_nag = true;
+      };
+
       windowrule = [
         "match:class kitty, float on, size 960 600, center on"
       ];
 
       layerrule = [
-        "match:namespace waybar,       blur on"
-        "match:namespace waybar,       blur_popups on"
-        "match:namespace waybar,       ignore_alpha 0"
+        "match:namespace waybar,        blur on"
+        "match:namespace waybar,        blur_popups on"
+        "match:namespace waybar,        ignore_alpha 0.5"
         "match:namespace notifications, blur on"
         "match:namespace notifications, blur_popups on"
-        "match:namespace notifications, ignore_alpha 0"
-        "match:namespace rofi,         blur on"
-        "match:namespace rofi,         blur_popups on"
-        "match:namespace rofi,         ignore_alpha 0"
-        "match:namespace swayosd,      blur on"
-        "match:namespace swayosd,      blur_popups on"
-        "match:namespace swayosd,      ignore_alpha 0"
+        "match:namespace notifications, ignore_alpha 0.5"
+        "match:namespace rofi,          blur on"
+        "match:namespace rofi,          blur_popups on"
+        "match:namespace rofi,          ignore_alpha 0.5"
       ];
 
       bind = [
@@ -508,13 +493,13 @@
         "$mod SHIFT, 0, movetoworkspace, 10"
       ];
 
-      bindl = [
-        ", XF86AudioRaiseVolume,  exec, swayosd-client --output-volume raise"
-        ", XF86AudioLowerVolume,  exec, swayosd-client --output-volume lower"
-        ", XF86AudioMute,         exec, swayosd-client --output-volume mute-toggle"
-        ", XF86AudioMicMute,      exec, swayosd-client --input-volume mute-toggle"
-        ", XF86MonBrightnessUp,   exec, swayosd-client --brightness raise"
-        ", XF86MonBrightnessDown, exec, swayosd-client --brightness lower"
+      bindel = [
+        ", XF86AudioRaiseVolume,  exec, wpctl set-volume --limit 1.0 @DEFAULT_AUDIO_SINK@ 5%+ && notify-send -h string:x-canonical-private-synchronous:vol -h int:value:$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{printf \"%d\", $2*100}') -t 1500 '󰕾' \"$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{printf \"%d%%\", $2*100}')\""
+        ", XF86AudioLowerVolume,  exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- && notify-send -h string:x-canonical-private-synchronous:vol -h int:value:$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{printf \"%d\", $2*100}') -t 1500 '󰕿' \"$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{printf \"%d%%\", $2*100}')\""
+        ", XF86AudioMute,         exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle && notify-send -h string:x-canonical-private-synchronous:vol -t 1500 '󰝟' Muted"
+        ", XF86AudioMicMute,      exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && notify-send -h string:x-canonical-private-synchronous:mic -t 1500 '󰍭' Muted"
+        ", XF86MonBrightnessUp,   exec, brightnessctl set 5%+ && notify-send -h string:x-canonical-private-synchronous:bri -h int:value:$(brightnessctl -m | awk -F, '{print $4}' | tr -d '%') -t 1500 '󰃠' \"$(brightnessctl -m | awk -F, '{print $4}')\""
+        ", XF86MonBrightnessDown, exec, brightnessctl set 5%- && notify-send -h string:x-canonical-private-synchronous:bri -h int:value:$(brightnessctl -m | awk -F, '{print $4}' | tr -d '%') -t 1500 '󰃞' \"$(brightnessctl -m | awk -F, '{print $4}')\""
       ];
 
       bindm = [

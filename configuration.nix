@@ -6,16 +6,14 @@
   # ==========================================================================
 
   boot.loader = {
-    grub = {
-      enable = true;
-      device = "nodev";
-      efiSupport = true;
-      useOSProber = true;
-    };
     efi.canTouchEfiVariables = true;
+    limine = {
+      enable = true;
+      maxGenerations = 10;
+    };
+
   };
 
-  boot.initrd.kernelModules = [ "xe" ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [
     "i915.force_probe=!7d55"
@@ -28,9 +26,6 @@
   boot.kernel.sysctl = {
     "net.core.default_qdisc" = "fq";
     "net.ipv4.tcp_congestion_control" = "bbr";
-    "vm.swappiness" = 10;
-    "vm.dirty_ratio" = 10;
-    "vm.dirty_background_ratio" = 5;
   };
 
   # ==========================================================================
@@ -48,7 +43,6 @@
       vpl-gpu-rt
       intel-compute-runtime
       level-zero
-      intel-npu-driver
     ];
   };
 
@@ -62,12 +56,18 @@
   # ==========================================================================
 
   services.power-profiles-daemon.enable = true;
+  services.scx = {
+    enable = true;
+    scheduler = "scx_bpfland";
+  };
 
   # ==========================================================================
   # SERVICES
   # ==========================================================================
 
   # --- ThinkPad ---
+  services.hardware.bolt.enable = true;
+  services.upower.enable = true;
   services.fprintd.enable = true;
   services.fwupd.enable = true;
 
@@ -78,11 +78,25 @@
     memoryPercent = 50;
   };
   services.fstrim.enable = true;
+  boot.tmp.useTmpfs = true;
 
   # --- Networking ---
   networking = {
     hostName = "nixos";
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+    };
+    firewall = {
+      allowedTCPPorts = [
+        25565
+        1716
+      ];
+      allowedUDPPorts = [
+        19132
+        1714
+        1715
+      ];
+    };
   };
   services.blueman.enable = true;
 
@@ -99,12 +113,12 @@
   # --- Desktop ---
   services.gvfs.enable = true;
   services.udisks2.enable = true;
+  services.dbus.implementation = "broker";
 
   # --- Environment ---
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
     NIXOS_OZONE_WL = "1";
-    MOZ_ENABLE_WAYLAND = "1";
   };
 
   # ==========================================================================
@@ -125,6 +139,7 @@
   programs.nh = {
     enable = true;
     clean.enable = true;
+    flake = "/etc/nixos";
   };
 
   nix.settings = {

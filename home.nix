@@ -15,24 +15,36 @@
   # EDITORS
   # ==========================================================================
 
+  programs.helix = {
+    enable = true;
+    defaultEditor = true;
+    settings.editor.auto-format = true;
+    extraPackages = with pkgs; [
+      jdt-language-server
+      clang-tools
+      nixd
+      nixfmt
+    ];
+  };
+
   programs.zed-editor = {
     enable = true;
-    extensions = [ "java" ];
-
+    extensions = [
+      "java"
+      "xml"
+    ];
     userSettings = {
+      # disable_ai = true;
       telemetry = {
         diagnostics = false;
         metrics = false;
       };
-      assistant.enabled = false;
       lsp = {
         jdtls.binary.path = "${pkgs.jdt-language-server}/bin/jdtls";
         clangd.binary.path = "${pkgs.clang-tools}/bin/clangd";
         nixd.binary.path = "${pkgs.nixd}/bin/nixd";
-        bash-language-server.binary.path = "${pkgs.nodePackages.bash-language-server}/bin/bash-language-server";
       };
     };
-
     userKeymaps = [
       {
         context = "Workspace";
@@ -42,12 +54,11 @@
         };
       }
     ];
-
     extraPackages = with pkgs; [
       jdt-language-server
       clang-tools
       nixd
-      nodePackages.bash-language-server
+      nixfmt
     ];
   };
 
@@ -55,8 +66,6 @@
   # PROGRAMS
   # ==========================================================================
 
-  programs.obs-studio.enable = true;
-  programs.spicetify.enable = true;
   programs.java.enable = true;
   programs.gcc.enable = true;
 
@@ -69,6 +78,8 @@
   };
 
   programs.btop.enable = true;
+
+  programs.spicetify.enable = true;
 
   programs.fastfetch = {
     enable = true;
@@ -175,11 +186,14 @@
 
   home.packages = with pkgs; [
     # --- Development ---
+    maven
+    gnumake
     cmake
 
     # --- Media ---
     gimp
     ffmpeg
+    vlc
 
     # --- Games ---
     prismlauncher

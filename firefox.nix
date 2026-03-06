@@ -32,7 +32,6 @@
 
         # --- UI ---
         "browser.uidensity" = 1;
-        "browser.newtabpage.enabled" = false;
         "browser.toolbars.bookmarks.visibility" = "never";
       };
     };

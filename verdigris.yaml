@@ -1,27 +1,34 @@
 scheme: "Verdigris"
 author: "YsfOuz"
 
-base00: "0C2323"
-base01: "102C2C"
-base02: "143837"
-base03: "1A4745"
-base04: "F0E3D6"
-base05: "C0B5AB"
-base06: "999088"
-base07: "7A736C"
-base08: "B3653C"
-base09: "A08E50"
-base0A: "8DA363"
-base0B: "48B777"
-base0C: "43B3AE"
-base0D: "2A91A2"
-base0E: "3E5586"
-base0F: "B87333"
-base10: "956E59"
-base11: "968D6E"
-base12: "919C7C"
-base13: "6BA282"
-base14: "69A19F"
-base15: "4F828B"
-base16: "48546C"
-base17: "9C7959"
+# --- Backgrounds ---
+base00: "0C2323"  # Default background
+base01: "102C2C"  # Lighter background (status bars, line highlight)
+base02: "143837"  # Selection background
+base03: "1A4745"  # Comments, invisibles, line numbers
+
+# --- Foregrounds ---
+base04: "F0E3D6"  # Dark foreground (status bars)
+base05: "C0B5AB"  # Default foreground, caret, delimiters
+base06: "999088"  # Light foreground (not often used)
+base07: "7A736C"  # Light background (not often used)
+
+# --- Accent colors ---
+base08: "B3653C"  # Red    — variables, XML tags, markup link text
+base09: "A08E50"  # Orange — integers, booleans, constants
+base0A: "8DA363"  # Yellow — classes, search text background
+base0B: "48B777"  # Green  — strings, inherited class, markup code
+base0C: "43B3AE"  # Cyan   — support, regex, escape chars, markup quotes
+base0D: "2A91A2"  # Blue   — functions, methods, headings
+base0E: "3E5586"  # Purple — keywords, storage, selectors
+base0F: "B87333"  # Brown  — deprecated, embedded language tags
+
+# --- Extended palette (base10–base17) ---
+base10: "956E59"  # Muted rust
+base11: "968D6E"  # Muted gold
+base12: "919C7C"  # Muted olive
+base13: "6BA282"  # Muted teal-green
+base14: "69A19F"  # Muted cyan-teal
+base15: "4F828B"  # Muted blue-teal
+base16: "48546C"  # Muted slate-blue
+base17: "9C7959"  # Muted bronze

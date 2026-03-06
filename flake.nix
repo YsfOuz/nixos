@@ -22,11 +22,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -42,7 +37,6 @@
       nixpkgs,
       home-manager,
       stylix,
-      nixvim,
       spicetify-nix,
       ...
     }@inputs:
@@ -53,14 +47,13 @@
         modules = [
           # --- Core ---
           ./hardware-configuration.nix
+          ./fix.nix
           ./configuration.nix
           ./user.nix
 
           # --- Theming & Editor ---
           stylix.nixosModules.stylix
-          nixvim.nixosModules.nixvim
           ./stylix.nix
-          ./nixvim.nix
 
           # --- Home Manager ---
           home-manager.nixosModules.home-manager
