@@ -1,159 +1,393 @@
-<div align="center">
+# Yusuf's NixOS Flake
 
-![Verdigris](verdigris.png)
-https://github.com/user-attachments/assets/455ce3d4-a937-497a-8c73-cb349be3b06f
-
-# verdigris
-
-*A NixOS flake for the Lenovo ThinkPad E16 Gen 2*
-
-</div>
+A fully declarative NixOS configuration for the Lenovo ThinkPad E16 Gen 2, built on Hyprland with the custom **Verdigris** colorscheme.
 
 ---
 
 ## Overview
 
-A fully declarative NixOS configuration built around the **Verdigris** colorscheme — deep teal backgrounds, warm copper-rust accents, and muted earth tones. Themed end-to-end via Stylix with a Hyprland desktop.
+This flake provides a complete, reproducible system setup with:
+- **Hyprland** wayland compositor with custom keybindings
+- **Verdigris** dark teal theme with warm metallic accents (Base16 scheme)
+- Development tools: Helix, Zed, Java, Rust, C/C++, Nix
+- Gaming: Steam + Proton, Prismlauncher
+- Privacy-focused Firefox with hardened policies
+- Local services: Searx, Ollama, KDE Connect
+- Power management optimized for ThinkPad
 
-## Structure
+---
+
+## File Structure
 
 ```
 .
-├── flake.nix              # Inputs & system definition
-├── hardware-configuration.nix
-├── configuration.nix      # Boot, hardware, networking, audio, Nix settings
-├── user.nix               # User account, shell (fish), gaming, greeter
-├── home.nix               # Home Manager — editors, packages, fastfetch
-├── hyprland.nix           # Hyprland WM + Waybar + Rofi + Kitty + Mako
-├── firefox.nix            # Firefox with hardened policies
-├── stylix.nix             # Theming (colors, fonts, cursor, icons, opacity)
-├── fix.nix                # ThinkPad E16 Gen 2 RAPL power-limit workaround
-├── verdigris.yaml         # Base16 colorscheme definition
-└── verdigris.png          # Wallpaper
+├── flake.nix                  # Flake inputs & system configuration
+├── hardware-configuration.nix # Hardware-specific settings
+├── configuration.nix          # Boot, hardware, networking, audio, Nix settings
+├── user.nix                   # User account, shell, services, gaming
+├── home.nix                   # Home Manager — editors, packages, dev tools
+├── hyprland.nix               # Hyprland WM + Waybar + Fuzzel + Hyprlock + Hypridle
+├── firefox.nix                # Firefox with privacy policies & hardening
+├── stylix.nix                 # System-wide theming via Stylix
+├── verdigris.yaml             # Custom Base16 colorscheme
+└── verdigrisMinimal.png       # Wallpaper
 ```
+
+---
 
 ## Flake Inputs
 
 | Input | Purpose |
 |---|---|
-| `nixpkgs/nixos-unstable` | Rolling package set |
+| `nixpkgs/nixos-unstable` | Bleeding-edge package set |
 | `home-manager` | Declarative user environment |
-| `stylix` | System-wide theming from a Base16 scheme |
-| `spicetify-nix` | Spotify client theming |
-| `firefox-addons` (rycee) | Declarative Firefox extensions |
+| `stylix` | System-wide theming from Base16 scheme |
 
-## Desktop
+---
+
+## Hardware
+
+**Device:** Lenovo ThinkPad E16 Gen 2  
+**CPU:** Intel Core Ultra 7 155H  
+**GPU:** Intel Arc (Xe) integrated graphics
+
+### Hardware Features
+- Intel Arc GPU: forced via `xe.force_probe=7d55` (disables i915)
+- Hardware video decode: iHD / VAAPI
+- Fingerprint reader (`fprintd`), Thunderbolt (`bolt`), firmware updates (`fwupd`)
+- Bluetooth + Network Manager
+- BBR TCP congestion control
+
+### Power & Thermal
+- `thermald` for thermal management
+- TLP for battery conservation:
+  - Charge: 75–80% threshold
+  - Enable power delivery
+- zram swap (50%, zstd compression)
+- tmpfs `/tmp` for speed
+
+---
+
+## Boot & System
+
+**Bootloader:** Limine (max 10 generations)  
+**Kernel:** Latest stable + custom kernel parameters:
+- `xe.force_probe=7d55` — Intel Arc
+- `i915.force_probe=!7d55` — Disable i915
+- `nowatchdog`, `quiet`
+
+**Networking:**
+- NetworkManager
+- Firewall ports:
+  - TCP: 25565 (Minecraft), 1716 (KDE Connect), 8080
+  - UDP: 19132 (Bedrock), 1714–1715 (KDE Connect)
+
+**Audio:** PipeWire + ALSA + Pulse (32-bit support)  
+**Display:** Wayland, NIXOS_OZONE_WL=1  
+**Locale:** Turkish keyboard layout (tr), Istanbul timezone
+
+---
+
+## Hyprland Desktop Environment
+
+### Components
 
 | Component | Choice |
 |---|---|
 | Window manager | Hyprland |
-| Bar | Waybar (left sidebar + bottom media bar) |
-| Launcher | Rofi (drun, clipboard, power menu) |
-| Terminal | Kitty |
+| Launcher | Fuzzel |
+| Top bar | Waybar (left sidebar + bottom media) |
 | Notifications | Mako |
-| File manager | Thunar |
 | Lock screen | Hyprlock (blurred screenshot + clock) |
 | Idle daemon | Hypridle |
+| Terminal | Alacritty |
+| File manager | Thunar |
+| Screenshots | Hyprshot |
+| Clipboard history | Cliphist |
 
 ### Keybindings
 
-| Key | Action |
+#### Window & App Management
+| Binding | Action |
 |---|---|
-| `Super + Return` | Terminal (Kitty) |
-| `Super + Space` | App launcher (Rofi) |
-| `Super + B` | Browser (Firefox) |
-| `Super + E` | File manager (Thunar) |
-| `Super + Q` | Close window |
-| `Super + T` | Toggle floating |
-| `Super + F` | Fullscreen |
-| `Super + L` | Lock screen |
-| `Super + C` | Clipboard history (cliphist → Rofi) |
-| `Super + Escape` | Power menu |
-| `Print` | Region screenshot (Hyprshot) |
-| `Super + 1–0` | Switch workspace |
-| `Super + Shift + 1–0` | Move window to workspace |
-| `Alt + Tab` | Cycle windows |
-| Media keys | Volume / brightness with OSD notifications |
+| `Super` + `Return` | Launch terminal (Alacritty) |
+| `Super` + `Space` | App launcher (Fuzzel) |
+| `Super` + `B` | Firefox |
+| `Super` + `E` | File manager (Thunar) |
+| `Super` + `Q` | Close window |
+| `Super` + `T` | Toggle floating |
+| `Super` + `F` | Fullscreen |
+| `Alt` + `Tab` | Cycle windows |
+| `Super` + `U` | Special workspace (scratchpad) |
 
-## Theme — Verdigris
+#### System Actions
+| Binding | Action |
+|---|---|
+| `Super` + `L` | Lock screen |
+| `Super` + `Escape` | Power menu (rofi) |
+| `Super` + `C` | Clipboard history (cliphist → Fuzzel) |
+| `Print` | Full screenshot |
+| `Super` + `Print` | Window screenshot |
+| `Ctrl` + `Print` | Region screenshot |
 
-A custom Base16 scheme with a dark teal foundation and warm metallic accents.
+#### Workspaces
+| Binding | Action |
+|---|---|
+| `Super` + `[1–0]` | Switch workspace |
+| `Super` + `Shift` + `[1–0]` | Move window to workspace |
 
-| Role | Hex | Swatch |
+#### Media Controls
+| Binding | Action |
+|---|---|
+| `XF86AudioRaiseVolume` | +5% volume w/ notification |
+| `XF86AudioLowerVolume` | −5% volume w/ notification |
+| `XF86AudioMute` | Toggle mute |
+| `XF86AudioMicMute` | Toggle mic |
+| `XF86MonBrightnessUp` | +5% brightness w/ notification |
+| `XF86MonBrightnessDown` | −5% brightness w/ notification |
+
+### Hyprland Settings
+- **Gaps:** 8px in/out
+- **Border:** None
+- **Rounding:** 8px
+- **Animations:** Custom bezier curve (`verdigris`) for fade, windows, layers, workspaces
+- **Cursor acceleration:** Flat
+- **Touchpad:** Natural scroll enabled
+- **Wallpaper:** `verdigrisMinimal.png`
+
+### Waybar
+
+**Left sidebar** (fixed width 48px):
+- Workspaces with icons
+- Clock (vertical format: HH / MM)
+- System tray
+- Idle inhibitor
+- Pulseaudio with volume %
+- Backlight with brightness %
+- Power profiles (performance / balanced / power-saver)
+- Battery with capacity % and time remaining
+
+**Bottom media bar** (height 48px):
+- Cava audio visualizer (64 bars)
+- MPRIS player controls w/ title/artist info
+- Player: Spotify integration (Firefox ignored)
+
+### Hypridle & Lock Screen
+- **150s:** Dim display to 10% brightness
+- **300s:** Lock screen
+- **330s:** DPMS off (display standby)
+- **1800s:** Suspend
+
+**Hyprlock:** Blurred screenshot background + large centered time + date below
+
+---
+
+## Theming: Verdigris
+
+A custom dark teal Base16 scheme with warm metallic accents.
+
+### Color Palette
+
+| Role | Hex | Use |
 |---|---|---|
-| Background | `#0C2323` | ![](https://placehold.co/18x18/0C2323/0C2323) |
-| Foreground | `#C0B5AB` | ![](https://placehold.co/18x18/C0B5AB/C0B5AB) |
-| Red / Variables | `#B3653C` | ![](https://placehold.co/18x18/B3653C/B3653C) |
-| Orange / Constants | `#A08E50` | ![](https://placehold.co/18x18/A08E50/A08E50) |
-| Yellow / Classes | `#8DA363` | ![](https://placehold.co/18x18/8DA363/8DA363) |
-| Green / Strings | `#48B777` | ![](https://placehold.co/18x18/48B777/48B777) |
-| Cyan / Support | `#43B3AE` | ![](https://placehold.co/18x18/43B3AE/43B3AE) |
-| Blue / Functions | `#2A91A2` | ![](https://placehold.co/18x18/2A91A2/2A91A2) |
-| Purple / Keywords | `#3E5586` | ![](https://placehold.co/18x18/3E5586/3E5586) |
-| Brown / Deprecated | `#B87333` | ![](https://placehold.co/18x18/B87333/B87333) |
+| **Background** | `#0C2323` | Windows, editor background |
+| **Foreground** | `#C0B5AB` | Default text |
+| **Red** | `#B3653C` | Variables, errors |
+| **Orange** | `#A08E50` | Numbers, constants |
+| **Yellow** | `#8DA363` | Classes, search highlights |
+| **Green** | `#48B777` | Strings |
+| **Cyan** | `#43B3AE` | Support, regex |
+| **Blue** | `#2A91A2` | Functions, headings |
+| **Purple** | `#3E5586` | Keywords, storage |
+| **Brown** | `#B87333` | Deprecated, tags |
 
-**Fonts:** Recursive Sans Casual Static (UI) · RecMonoCasual Nerd Font (mono)  
-**Cursor:** Bibata Modern Ice @ 24px  
-**Icons:** Papirus Dark  
-**Opacity:** 75% across applications, terminal, popups, and desktop
+### Extended Palette
+- **base10–base17:** Muted variants for UI elements
+  - Muted rust, gold, olive, teal, cyan, slate-blue, bronze
 
-## Editors
+### Typography
+- **UI Font:** Iosevka (sans-serif)
+- **Monospace:** Iosevka Nerd Font
+- **Cursor:** Bibata Modern Ice @ 24px
+- **Icons:** Papirus Dark
 
-- **Helix** — default editor with auto-format
-- **Zed** — GUI editor with custom keybinds (`Ctrl+T` terminal, `Ctrl+E` file tree)
+### Opacity
+All set to 100% (1.0):
+- Applications
+- Desktop
+- Popups
+- Terminal
 
-Both editors share the same LSP setup:
+---
 
-| LSP | Language |
+## Development
+
+### Editors
+
+**Helix** (default):
+- Auto-format on save
+- LSP setup (see below)
+
+**Zed:**
+- AI disabled, telemetry off
+- Custom keybinds:
+  - `Ctrl` + `T` → Toggle terminal
+  - `Ctrl` + `E` → Toggle file tree
+- LSP setup (see below)
+
+### Language Servers
+
+| Language | Server |
 |---|---|
-| `jdt-language-server` | Java |
-| `clang-tools` (clangd) | C / C++ |
-| `nixd` + `nixfmt` | Nix |
+| Nix | `nixd` + `nixfmt` |
+| Java | `jdt-language-server` |
+| C / C++ | `clang-tools` (clangd) |
+| Rust | `rust-analyzer` |
 
-## Shell
+### Available Tools
+- GCC, Clang
+- Cargo (Rust)
+- Maven
+- Make, CMake
+- Graphviz
 
-Fish shell with Starship prompt and the following aliases:
+---
 
+## Shell & CLI
+
+**Shell:** Fish with Starship prompt
+
+### Aliases
 | Alias | Command |
 |---|---|
 | `ls` | `eza --icons` |
 | `tree` | `eza --tree --icons` |
 | `cat` | `bat` |
-| `cd` | `z` (zoxide) |
 
-Fastfetch runs on every interactive shell start.
+**Auto-run:** `fastfetch` on every interactive shell start
 
-## Hardware
+### System Monitor
+`btop` for real-time process & resource monitoring
 
-**Lenovo ThinkPad E16 Gen 2** · Intel Core Ultra 7 155H · Intel Arc integrated graphics
+---
 
-Notable configuration:
+## Applications
 
-- Intel Arc GPU forced via the `xe` driver (`xe.force_probe=7d55`)
-- Hardware-accelerated video decode via `iHD` / VAAPI
-- `scx_bpfland` scheduler for improved responsiveness
-- zram swap (50%, zstd) + tmpfs `/tmp`
-- Fingerprint reader (`fprintd`), Thunderbolt (`bolt`), firmware updates (`fwupd`)
-- BBR TCP congestion control
+### Development
+- **Claude Code** (CLI)
+- Lynx (terminal web browser)
+- Graphviz
 
-### Power Fix (`fix.nix`)
+### Media
+- Spotify
+- GIMP
+- FFmpeg
+- VLC
 
-Lenovo ships the E16 Gen 2 with conservative RAPL limits (PL1 40W / PL2 55W). This config raises them to **PL1 45W / PL2 115W** via a oneshot systemd service and resume hook. Firmware currently clamps sustained power to 28W regardless; the higher values will take full effect automatically if a future BIOS update raises the ceiling.
+### Productivity
+- LibreOffice
 
-> Upgrade note: if you move to a 96W/100W charger, raise `constraint_0` to `65000000`.
+### Gaming
+- Steam + Proton (GE builds)
+- Prism Launcher (Minecraft)
+- Mindustry
+
+### Utils
+- Unzip / Zip
+- Intel GPU monitor (nvtop)
+- Alacritty (terminal)
+- Thunar (file manager)
+
+---
+
+## Services
+
+### Searx (Meta Search)
+- Local privacy-respecting search engine
+- Redis backend
+- JSON + HTML formats
+- Accessible locally
+
+### Ollama
+- Local LLM inference
+- Available for local AI tasks
+
+### Gaming & Connectivity
+- **Steam:** With Proton + GE compatibility layer
+- **KDE Connect:** Phone integration
+- **Blueman:** Bluetooth management
+
+### Desktop Services
+- **GVFS:** Virtual filesystem abstraction
+- **UDisks2:** Storage management
+- **D-Bus Broker:** IPC
+- **Systemd:** Integration with Hyprland
+
+---
 
 ## Firefox
 
-Policies enforced declaratively — no telemetry, no Pocket, no Firefox Accounts, no saved logins. Strict content blocking and HTTPS-only mode enabled. Hardware video decode via VAAPI. Extension: **uBlock Origin**.
+### Policies
+- **No telemetry** (health reporting, usage tracking disabled)
+- **No AI**: default blocked
+- **No saved logins** (password generation disabled)
+- **No Pocket** (implied by search defaults)
+- **No Firefox Accounts**
+
+### Privacy
+- Sanitize data on shutdown (except cookies/storage)
+- History disabled
+- Form autofill disabled
+- Credit card autofill disabled
+- Firefox Relay disabled
+
+### Search
+- **Default engines:** DuckDuckGo (private + normal)
+- Enforce user choice
+- No search suggestions in URL bar
+
+### UI
+- **Vertical sidebar** with tab groups disabled
+- Collapse-on-hover sidebar visibility
+- Hide search suggestion prefilling
+
+### Extensions
+- **uBlock Origin** (force-installed)
+
+### Hardware
+- VAAPI video decode enabled
+
+---
 
 ## Deployment
 
-```sh
-# First-time
+### First-time Installation
+```bash
 nixos-install --flake .#nixos
+```
 
-# Rebuild
+### System Rebuild
+```bash
 nh os switch /etc/nixos
 ```
 
-The flake is pinned at `/etc/nixos`. `nh` handles builds and automatically cleans old generations.
+The flake is pinned at `/etc/nixos`. The `nh` tool handles builds and automatically manages old generations.
+
+---
+
+## System Details
+
+- **NixOS State Version:** 26.05
+- **Boot Loader:** Limine (10 generation max)
+- **Unfree Packages:** Enabled
+- **Cachix:** nix-community (faster builds)
+- **Nix Features:** flakes, nix-command
+
+---
+
+## Notes
+
+- **Git user:** Yusuf Oğuz (ysfouz2007@gmail.com)
+- **Timezone:** Europe/Istanbul (UTC+03:00)
+- **Keyboard layout:** Turkish (tr)
+- This config assumes a fresh NixOS install on the ThinkPad E16 Gen 2. Other hardware may require adjustments to `hardware-configuration.nix`.
