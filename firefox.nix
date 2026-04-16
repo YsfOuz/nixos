@@ -1,54 +1,75 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 {
+  stylix.targets.firefox.profileNames = [ "default" ];
   programs.firefox = {
     enable = true;
+
+    # Extensions
+    policies.ExtensionSettings = {
+      "uBlock0@raymondhill.net" = {
+        install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+        installation_mode = "force_installed";
+      };
+    };
 
     profiles.default = {
       id = 0;
       isDefault = true;
 
+      # Search engine
       search = {
-        force = true;
         default = "ddg";
+        privateDefault = "ddg";
+        force = true;
       };
-
-      extensions.packages = with inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}; [
-        ublock-origin
-      ];
 
       settings = {
-        # --- Performance ---
-        "gfx.webrender.all" = true;
-        "media.ffmpeg.vaapi.enabled" = true;
-        "media.hardware-video-decoding.force-enabled" = true;
-        "widget.dmabuf.force-enabled" = true;
 
-        # --- Privacy & Security ---
-        "browser.contentblocking.category" = "strict";
-        "dom.security.https_only_mode" = true;
-        "network.predictor.enabled" = false;
-        "network.prefetch-next" = false;
-        "security.tls.enable_0rtt_data" = false;
+        # AI / ML
+        "browser.ai.control.default" = "blocked";
 
-        # --- UI ---
-        "browser.uidensity" = 1;
-        "browser.toolbars.bookmarks.visibility" = "never";
+        # Telemetry / data reporting
+        "datareporting.healthreport.uploadEnabled" = false;
+        "datareporting.usage.uploadEnabled" = false;
+        "browser.search.serpEventTelemetryCategorization.regionEnabled" = false;
+
+        # Privacy / sanitize on shutdown
+        "privacy.sanitize.sanitizeOnShutdown" = true;
+        "privacy.clearOnShutdown_v2.cookiesAndStorage" = false;
+        "places.history.enabled" = false;
+
+        # Forms / passwords / autofill
+        "browser.formfill.enable" = false;
+        "extensions.formautofill.addresses.enabled" = false;
+        "extensions.formautofill.creditCards.enabled" = false;
+        "signon.generation.enabled" = false;
+        "signon.firefoxRelay.feature" = "disabled";
+
+        # New tab
+        "browser.newtabpage.activity-stream.feeds.topsites" = false;
+
+        # URL bar
+        "browser.urlbar.suggest.bookmark" = false;
+        "browser.urlbar.suggest.engines" = false;
+        "browser.urlbar.suggest.history" = false;
+        "browser.urlbar.suggest.openpage" = false;
+        "browser.urlbar.suggest.quickactions" = false;
+        "browser.urlbar.suggest.recentsearches" = false;
+        "browser.urlbar.suggest.topsites" = false;
+        "browser.urlbar.shortcuts.actions" = false;
+        "browser.urlbar.shortcuts.bookmarks" = false;
+        "browser.urlbar.shortcuts.history" = false;
+        "browser.urlbar.shortcuts.tabs" = false;
+        "browser.urlbar.showSearchSuggestionsFirst" = false;
+        "browser.search.suggest.enabled.private" = true;
+
+        # UI / sidebar
+        "sidebar.verticalTabs" = true;
+        "sidebar.revamp" = true;
+        "sidebar.visibility" = "expand-on-hover";
+        "browser.tabs.groups.smart.userEnabled" = false;
+        "browser.theme.toolbar-theme" = 0;
       };
     };
-
-    policies = {
-      DisableTelemetry = true;
-      DisableFirefoxStudies = true;
-      DisablePocket = true;
-      DisableFirefoxAccounts = true;
-      DisableFormHistory = true;
-      DisableFirefoxScreenshots = true;
-      DisableSetDesktopBackground = true;
-      NoDefaultBookmarks = true;
-      OfferToSaveLogins = false;
-      PasswordManagerEnabled = false;
-    };
   };
-
-  stylix.targets.firefox.profileNames = [ "default" ];
 }

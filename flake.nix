@@ -12,18 +12,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    firefox-addons = {
-      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     stylix = {
       url = "github:nix-community/stylix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    spicetify-nix = {
-      url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -37,7 +27,6 @@
       nixpkgs,
       home-manager,
       stylix,
-      spicetify-nix,
       ...
     }@inputs:
     {
@@ -47,7 +36,6 @@
         modules = [
           # --- Core ---
           ./hardware-configuration.nix
-          ./fix.nix
           ./configuration.nix
           ./user.nix
 
@@ -69,10 +57,6 @@
                 ./stylix.nix
                 ./firefox.nix
                 ./hyprland.nix
-              ];
-
-              sharedModules = [
-                inputs.spicetify-nix.homeManagerModules.default
               ];
             };
           }

@@ -2,7 +2,8 @@
 {
   stylix = {
     enable = true;
-    image = ./verdigris.png;
+    # image = ./verdigris.png;
+    image = ./verdigrisMinimal.png;
     base16Scheme = ./verdigris.yaml;
     polarity = "dark";
 
@@ -29,19 +30,16 @@
 
     fonts = {
       sansSerif = {
-        package = pkgs.recursive;
-        name = "Recursive Sans Casual Static";
+        package = pkgs.iosevka;
+        name = "Iosevka";
       };
       monospace = {
-        package = pkgs.nerd-fonts.recursive-mono;
-        name = "RecMonoCasual Nerd Font";
+        package = pkgs.nerd-fonts.iosevka;
+        name = "Iosevka Nerd Font";
       };
       serif = {
-        package = pkgs.recursive;
-        name = "Recursive Sans Casual Static";
-      };
-      sizes = {
-        desktop = 12;
+        package = pkgs.iosevka;
+        name = "Iosevka";
       };
     };
 
@@ -50,10 +48,10 @@
     # ==========================================================================
 
     opacity = {
-      applications = 0.75;
-      desktop = 0.75;
-      popups = 0.75;
-      terminal = 0.75;
+      applications = 1.0;
+      desktop = 1.0;
+      popups = 1.0;
+      terminal = 1.0;
     };
   };
 }

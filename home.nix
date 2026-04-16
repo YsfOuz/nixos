@@ -7,7 +7,7 @@
 
   home.username = "yusuf";
   home.homeDirectory = "/home/yusuf";
-  home.stateVersion = "25.11";
+  home.stateVersion = "26.05";
 
   programs.home-manager.enable = true;
 
@@ -24,6 +24,7 @@
       clang-tools
       nixd
       nixfmt
+      rust-analyzer
     ];
   };
 
@@ -34,15 +35,10 @@
       "xml"
     ];
     userSettings = {
-      # disable_ai = true;
+      disable_ai = true;
       telemetry = {
         diagnostics = false;
         metrics = false;
-      };
-      lsp = {
-        jdtls.binary.path = "${pkgs.jdt-language-server}/bin/jdtls";
-        clangd.binary.path = "${pkgs.clang-tools}/bin/clangd";
-        nixd.binary.path = "${pkgs.nixd}/bin/nixd";
       };
     };
     userKeymaps = [
@@ -58,7 +54,7 @@
       jdt-language-server
       clang-tools
       nixd
-      nixfmt
+      rust-analyzer
     ];
   };
 
@@ -66,8 +62,21 @@
   # PROGRAMS
   # ==========================================================================
 
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      window = {
+        padding = {
+          x = 4;
+          y = 4;
+        };
+      };
+    };
+  };
+
   programs.java.enable = true;
   programs.gcc.enable = true;
+  programs.cargo.enable = true;
 
   programs.git = {
     enable = true;
@@ -78,8 +87,6 @@
   };
 
   programs.btop.enable = true;
-
-  programs.spicetify.enable = true;
 
   programs.fastfetch = {
     enable = true;
@@ -109,26 +116,26 @@
         }
         {
           type = "cpu";
-          key = "╭ 󰘚 CPU";
+          key = "󰘚 CPU";
           keyColor = "green";
           showPeCoreCount = true;
           format = "{1}";
         }
         {
           type = "gpu";
-          key = "├ 󰢮 GPU";
+          key = "󰢮 GPU";
           keyColor = "yellow";
           format = "{2}";
         }
         {
           type = "memory";
-          key = "├  RAM";
+          key = " RAM";
           keyColor = "magenta";
           format = "{1} / {2} ({3})";
         }
         {
           type = "disk";
-          key = "╰  DSK";
+          key = " DSK";
           keyColor = "cyan";
           format = "{1} / {2} ({3})";
         }
@@ -186,11 +193,15 @@
 
   home.packages = with pkgs; [
     # --- Development ---
+    claude-code-bin
+    lynx
+    graphviz
     maven
     gnumake
     cmake
 
     # --- Media ---
+    spotify
     gimp
     ffmpeg
     vlc

@@ -24,6 +24,7 @@
   ];
 
   boot.kernel.sysctl = {
+    # Network
     "net.core.default_qdisc" = "fq";
     "net.ipv4.tcp_congestion_control" = "bbr";
   };
@@ -33,7 +34,6 @@
   # ==========================================================================
 
   hardware.enableAllFirmware = true;
-  hardware.cpu.intel.updateMicrocode = true;
 
   hardware.graphics = {
     enable = true;
@@ -43,6 +43,7 @@
       vpl-gpu-rt
       intel-compute-runtime
       level-zero
+      intel-npu-driver
     ];
   };
 
@@ -55,11 +56,22 @@
   # POWER MANAGEMENT
   # ==========================================================================
 
-  services.power-profiles-daemon.enable = true;
-  services.scx = {
+  services.thermald.enable = true;
+  services.tlp = {
     enable = true;
-    scheduler = "scx_bpfland";
+    pd.enable = true;
+    settings = {
+      START_CHARGE_THRESH_BAT0 = 75;
+      STOP_CHARGE_THRESH_BAT0 = 80;
+    };
   };
+
+  /*
+    services.scx = {
+      enable = true;
+      scheduler = "scx_lavd";
+    };
+  */
 
   # ==========================================================================
   # SERVICES
@@ -70,6 +82,7 @@
   services.upower.enable = true;
   services.fprintd.enable = true;
   services.fwupd.enable = true;
+  services.irqbalance.enable = true;
 
   # --- Storage ---
   zramSwap = {
@@ -90,6 +103,7 @@
       allowedTCPPorts = [
         25565
         1716
+        8080
       ];
       allowedUDPPorts = [
         19132
@@ -107,7 +121,6 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    jack.enable = true;
   };
 
   # --- Desktop ---
@@ -158,6 +171,9 @@
     ];
   };
 
+  nix.daemonCPUSchedPolicy = "idle";
+  nix.daemonIOSchedClass = "idle";
+
   # ==========================================================================
   # MISC
   # ==========================================================================
@@ -169,5 +185,5 @@
     nixos.enable = false;
   };
 
-  system.stateVersion = "25.11";
+  system.stateVersion = "26.05";
 }

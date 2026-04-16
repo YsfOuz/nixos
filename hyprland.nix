@@ -15,73 +15,32 @@
     wl-clipboard
     thunar
     tumbler
-    rofi-power-menu
     brightnessctl
     libnotify
+    grim
   ];
 
   # ==========================================================================
   # PROGRAMS
   # ==========================================================================
 
-  # --- Rofi ---
-  programs.rofi = {
-    enable = true;
-    extraConfig.show-icons = true;
-    location = "right";
-    theme =
-      let
-        inherit (config.lib.formats.rasi) mkLiteral;
-      in
-      {
-        "*".border-radius = mkLiteral "8px";
-        "window" = {
-          height = mkLiteral "100%";
-          width = mkLiteral "25%";
-          margin = mkLiteral "8px";
-        };
-        "mainbox" = {
-          background-color = mkLiteral "transparent";
-          children = map mkLiteral [
-            "inputbar"
-            "listview"
-          ];
-        };
-        "inputbar" = {
-          spacing = mkLiteral "8px";
-          padding = mkLiteral "8px";
-          children = map mkLiteral [ "entry" ];
-        };
-        "entry".placeholder = "Search...";
-        "listview" = {
-          spacing = mkLiteral "4px";
-          padding = mkLiteral "8px";
-          background-color = mkLiteral "transparent";
-        };
-        "element" = {
-          spacing = mkLiteral "8px";
-          padding = mkLiteral "4px";
-          background-color = mkLiteral "transparent";
-        };
-        "element-text" = {
-          background-color = lib.mkForce (mkLiteral "transparent");
-          vertical-align = mkLiteral "0.5";
-        };
-        "element-icon" = {
-          background-color = lib.mkForce (mkLiteral "transparent");
-          size = mkLiteral "32px";
-        };
-      };
-  };
-
-  # --- Kitty ---
-  programs.kitty = {
+  # --- Fuzzel ---
+  programs.fuzzel = {
     enable = true;
     settings = {
-      window_padding_width = 4;
-      remember_window_size = "no";
-      initial_window_width = "960";
-      initial_window_height = "600";
+      main = {
+        terminal = "${pkgs.alacritty}/bin/alacritty -e";
+        anchor = "left";
+        x-margin = 8;
+        y-margin = 8;
+        width = 32;
+        image-size-ratio = 1;
+      };
+      border = {
+        radius = 8;
+        selection-radius = 8;
+        width = 0;
+      };
     };
   };
 
@@ -216,7 +175,6 @@
 
         modules-left = [ "mpris" ];
         modules-center = [ "cava" ];
-        modules-right = [ ];
 
         "cava" = {
           bars = 64;
@@ -250,7 +208,7 @@
     ];
 
     style = "
-      * { border-radius: 8px; }
+      * { font-size: 16px; border-radius: 8px; }
       .module { margin: 2px; padding: 2px; }
       #clock  { font-size: 24px; }
       #cava   { font-size: 24px; }
@@ -285,6 +243,7 @@
   services.network-manager-applet.enable = true;
   services.blueman-applet.enable = true;
   services.playerctld.enable = true;
+  services.hyprpolkitagent.enable = true;
 
   # ==========================================================================
   # IDLE & LOCK
@@ -329,8 +288,8 @@
       background = lib.mkForce [
         {
           path = "screenshot";
-          blur_passes = 4;
-          blur_size = 4;
+          blur_passes = 1;
+          blur_size = 1;
           noise = 0.1;
         }
       ];
@@ -342,7 +301,6 @@
           position = "0, 100";
           inner_color = "rgba(0, 0, 0, 0)";
           outer_color = "rgba(0, 0, 0, 0)";
-          font_color = "rgb(255, 255, 255)";
         }
       ];
 
@@ -376,8 +334,8 @@
 
     settings = {
       "$mod" = "SUPER";
-      "$terminal" = "kitty";
-      "$menu" = "rofi -show drun";
+      "$terminal" = "alacritty";
+      "$menu" = "fuzzel";
 
       monitor = ",preferred,auto,1";
 
@@ -392,10 +350,13 @@
         dim_strength = 0.25;
         rounding = 8;
         shadow = {
-          range = 16;
-          render_power = 16;
+          enabled = false;
+          range = 4;
+          sharp = true;
+          offset = "4 4";
         };
         blur = {
+          enabled = false;
           size = 4;
           passes = 4;
           noise = 0.1;
@@ -405,13 +366,13 @@
       };
 
       animations = {
-        enabled = true;
-        bezier = [ "bouncy, 0.25, -0.25, 0.75, 1.25" ];
+        # enabled = false;
+        bezier = [ "verdigris, 0.5, -0.5, 0.5, 1.5" ];
         animation = [
-          "fade,       1, 2, bouncy"
-          "windows,    1, 2, bouncy, popin"
-          "layers,     1, 2, bouncy, slide"
-          "workspaces, 1, 2, bouncy, slide"
+          "fade,       1, 2, verdigris"
+          "windows,    1, 2, verdigris, popin"
+          "layers,     1, 2, verdigris, slide"
+          "workspaces, 1, 2, verdigris, slide"
         ];
       };
 
@@ -426,7 +387,6 @@
       misc = {
         disable_hyprland_logo = true;
         force_default_wallpaper = 0;
-        vfr = true;
       };
 
       ecosystem = {
@@ -435,19 +395,20 @@
       };
 
       windowrule = [
-        "match:class kitty, float on, size 960 600, center on"
+        "match:class Alacritty, float on, size 960 600"
       ];
 
       layerrule = [
-        "match:namespace waybar,        blur on"
-        "match:namespace waybar,        blur_popups on"
-        "match:namespace waybar,        ignore_alpha 0.5"
-        "match:namespace notifications, blur on"
-        "match:namespace notifications, blur_popups on"
-        "match:namespace notifications, ignore_alpha 0.5"
-        "match:namespace rofi,          blur on"
-        "match:namespace rofi,          blur_popups on"
-        "match:namespace rofi,          ignore_alpha 0.5"
+        # "match:namespace waybar,        blur on"
+        # "match:namespace waybar,        blur_popups on"
+        # "match:namespace waybar,        ignore_alpha 0.5"
+        # "match:namespace notifications, blur on"
+        # "match:namespace notifications, blur_popups on"
+        # "match:namespace notifications, ignore_alpha 0.5"
+        # "match:namespace launcher,      blur on"
+        # "match:namespace launcher,      blur_popups on"
+        # "match:namespace launcher,      ignore_alpha 0.5"
+        "match:namespace selection,     no_anim on"
       ];
 
       bind = [
@@ -458,17 +419,20 @@
         "$mod, E,      exec, thunar"
 
         # Window Management
-        "$mod, Q, killactive"
-        "$mod, T, togglefloating"
-        "$mod, F, fullscreen"
+        "$mod, Q,   killactive"
+        "$mod, T,   togglefloating"
+        "$mod, F,   fullscreen"
         "ALT,  Tab, cyclenext"
         "ALT,  Tab, bringactivetotop"
+        "$mod, U,   togglespecialworkspace, uz"
 
         # Actions
-        "$mod, C,      exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
-        "$mod, L,      exec, hyprlock"
-        "$mod, Escape, exec, rofi -show menu -modi 'menu:rofi-power-menu'"
-        ",     Print,  exec, hyprshot -m region"
+        "$mod,    C,      exec, cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
+        "$mod,    L,      exec, hyprlock"
+        "$mod,    Escape, exec, rofi -show menu -modi 'menu:rofi-power-menu'"
+        ",        Print,  exec, hyprshot -m output"
+        "$mod,    Print,  exec, hyprshot -m window"
+        "Control, Print,  exec, hyprshot -m region"
 
         # Workspaces
         "$mod, 1, workspace, 1"

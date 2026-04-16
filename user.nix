@@ -6,18 +6,30 @@
   # ==========================================================================
 
   services.ollama.enable = true;
+  services.searx = {
+    enable = true;
+    redisCreateLocally = true;
+    settings = {
+      server = {
+        secret_key = "a9f3b1c8d2e7f4a5b6c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0";
+      };
+      search = {
+        formats = [
+          "html"
+          "json"
+        ];
+      };
+    };
+  };
 
   # ==========================================================================
   # GAMING
   # ==========================================================================
 
-  programs.gamemode.enable = true;
   programs.kdeconnect.enable = true;
 
   programs.steam = {
     enable = true;
-    gamescopeSession.enable = true;
-    remotePlay.openFirewall = true;
     extraCompatPackages = with pkgs; [ proton-ge-bin ];
   };
 
@@ -34,7 +46,6 @@
       "networkmanager"
       "video"
       "render"
-      "gamemode"
     ];
   };
 
@@ -52,17 +63,11 @@
       ls = "eza --icons";
       tree = "eza --tree --icons";
       cat = "bat";
-      cd = "z";
     };
   };
 
   programs.starship.enable = true;
   programs.bat.enable = true;
-
-  programs.zoxide = {
-    enable = true;
-    enableFishIntegration = true;
-  };
 
   environment.systemPackages = with pkgs; [ eza ];
 
